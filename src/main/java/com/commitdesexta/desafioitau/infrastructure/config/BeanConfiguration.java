@@ -7,12 +7,17 @@ import com.commitdesexta.desafioitau.application.port.output.TransacaoRepository
 import com.commitdesexta.desafioitau.application.usecase.CalcularEstatisticaUseCase;
 import com.commitdesexta.desafioitau.application.usecase.CriarTransacaoUseCase;
 import com.commitdesexta.desafioitau.application.usecase.DeletarTransacaoUseCase;
+import com.commitdesexta.desafioitau.infrastructure.adapter.MemoryHealthIndicator;
 import com.commitdesexta.desafioitau.infrastructure.adapter.TransacaoRepositoryAdapter;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.health.contributor.HealthIndicator;
 import org.springframework.context.annotation.Bean;
-import org.springframework.stereotype.Component;
+import org.springframework.context.annotation.Configuration;
 
-@Component
+@Configuration
 public class BeanConfiguration {
+    @Value("${estatistica.tempo-limite}")
+    private int tempoLimiteSegundos;
 
     @Bean
     public CriarTransacaoUseCasePort criarTransacaoUseCasePort(TransacaoRepositoryPort transacaoRepositoryPort){
@@ -30,6 +35,11 @@ public class BeanConfiguration {
 
     @Bean
     public TransacaoRepositoryPort transacaoRepositoryPort(){
-        return new TransacaoRepositoryAdapter();
+        return new TransacaoRepositoryAdapter(tempoLimiteSegundos);
+    }
+
+    @Bean
+    public MemoryHealthIndicator memoryHealthIndicator(TransacaoRepositoryPort transacaoRepositoryPort){
+        return new MemoryHealthIndicator(transacaoRepositoryPort);
     }
 }

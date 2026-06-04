@@ -5,6 +5,9 @@ import com.commitdesexta.desafioitau.application.port.input.CriarTransacaoUseCas
 import com.commitdesexta.desafioitau.application.port.input.DeletarTransacaoUseCasePort;
 import com.commitdesexta.desafioitau.infrastructure.mapper.TrasacaoMapper;
 import com.commitdesexta.desafioitau.infrastructure.web.controller.dto.TrasacaoRequest;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -19,12 +22,14 @@ public class TransacaoController {
     }
 
     @PostMapping
-    public void salva(@RequestBody TrasacaoRequest request){
+    public ResponseEntity<Void> salva(@RequestBody TrasacaoRequest request){
         criarTransacaoUseCasePort.execute(TrasacaoMapper.toDomain(request));
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @DeleteMapping
-    public void deletar(){
+    public ResponseEntity<Void> deletar(){
         deletarTransacaoUseCasePort.execute();
+        return ResponseEntity.status(200).build();
     }
 }

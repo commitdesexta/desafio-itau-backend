@@ -17,6 +17,10 @@ public class TransacaoRepositoryAdapter implements TransacaoRepositoryPort {
     private static final Logger log = LogManager.getLogger();
 
     private final List<Transacao> transacaos = Collections.synchronizedList(new ArrayList<>());
+    private final int tempoLimiteSegundos;
+    public TransacaoRepositoryAdapter(int tempoLimiteSegundos) {
+        this.tempoLimiteSegundos = tempoLimiteSegundos;
+    }
 
     @Override
     public void salvar(Transacao transacao) {
@@ -32,9 +36,9 @@ public class TransacaoRepositoryAdapter implements TransacaoRepositoryPort {
 
     @Override
     public Estatistica calcularEstatistica() {
-        log.info("Iniciando calculo estatistica");
+        log.info("Iniciando calculo estatistica {}s", tempoLimiteSegundos);
         synchronized (transacaos){
-            OffsetDateTime tempoLimite = OffsetDateTime.now().minusSeconds(60);
+            OffsetDateTime tempoLimite = OffsetDateTime.now().minusSeconds(tempoLimiteSegundos);
             List<Transacao> lista = transacaos.stream().filter(t -> t.dataHora().isAfter(tempoLimite) || t.dataHora().equals(tempoLimite)).toList();
             log.info("Calculando lista com {} items", lista.size());
             return Estatistica.gerarEstatisticas(lista);
